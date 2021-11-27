@@ -1,6 +1,7 @@
 import React, { createContext, useState } from "react";
 
 export const UsuarioContext = createContext();
+UsuarioContext.displayName="Usuário";
 
 
 export const UsuarioProvider = ({ children }) => { //props.children = é a props default react dos componentes que passar pro provider
