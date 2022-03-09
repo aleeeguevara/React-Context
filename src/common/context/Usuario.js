@@ -1,7 +1,7 @@
 import React, { createContext, useState } from "react";
 
 export const UsuarioContext = createContext();
-UsuarioContext.displayName="Usuário";
+UsuarioContext.displayName="Usuário"; // nome que vai aparecer no react devtool
 
 
 export const UsuarioProvider = ({ children }) => { //props.children = é a props default react dos componentes que passar pro provider
@@ -14,3 +14,4 @@ export const UsuarioProvider = ({ children }) => { //props.children = é a props
   );
 };
  
+//criamos componente customizado que tem responsabilidade de ter states e disponibilizar o provider para outros lugares
