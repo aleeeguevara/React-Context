@@ -26,7 +26,7 @@ export const CarrinhoProvider = ({children}) => {
 };
 
 // fazer hook customizado para esse carrinho
-export const useCarrinhoContext= () => {
+export const useCarrinhoContext = () => {
 
     const {
       carrinho,
@@ -74,11 +74,17 @@ export const useCarrinhoContext= () => {
       //escutar o carrinho e sempre que o state mudar tem que fazer a contagem de produto
       //como é um listener, o react disponibiliza o useEffect
       useEffect(()=> {
-        const novaQuantidade = carrinho.reduce((contador, produto) => contador + produto.quantidade, 0);
-        setQuantidadeProdutos(novaQuantidade);
-        const valorTotal = carrinho.reduce((contador, produto) => contador + produto.valor * produto.quantidade, 0);
+        const { novoTotal, novaQuantidade } = carrinho.reduce((contador, produto) => ({ //reduce retorna objeto com 2, parenteses quer dizer que esta retornando e os colchetes que esta retornando um obj
+          novaQuantidade: contador.novaQuantidade + produto.quantidade,
+          novoTotal: contador.novoTotal + (produto.valor * produto.quantidade)
+        }), {
+          novaQuantidade: 0,
+          novoTotal: 0
+        });
         
-        setValorProdutos(valorTotal);
+        
+        setQuantidadeProdutos(novaQuantidade);
+        setValorProdutos(novoTotal);
 
       },[carrinho, setQuantidadeProdutos, setValorProdutos]);
     

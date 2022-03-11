@@ -1,17 +1,20 @@
-import { Button, Snackbar, InputLabel } from '@material-ui/core';
+import { Button, Snackbar, InputLabel, Select, MenuItem } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import { useCarrinhoContext } from 'common/context/Carrinho';
+import { usePagamentoContext } from 'common/context/Pagamento';
 import { UsuarioContext } from 'common/context/Usuario';
 import Produto from 'components/Produto';
-import { useContext, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Container, Voltar, TotalContainer, PagamentoContainer} from './styles';
 
 function Carrinho() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const { valorProdutos, carrinho } = useCarrinhoContext()
-  const { saldo } = useContext(UsuarioContext);
+  const { valorProdutos, carrinho } = useCarrinhoContext();
+  const { tiposDePagamento, formaPagamento, mudarFormaDePagamento } = usePagamentoContext();
+  const { saldo = 0 } = useContext(UsuarioContext);
   const history = useHistory();
+  const total = useMemo(()=> (saldo - (valorProdutos * formaPagamento.juros)), [saldo, valorProdutos, formaPagamento]) //só vai calcular o total se o saldo, valorProdutos ou formaPagamento mudarem. Para não ter que calcular novamente a cada renderização feita.
   return (
     <Container>
       <Voltar onClick={() => history.goBack('/feira')}/>
@@ -26,19 +29,29 @@ function Carrinho() {
       ))}
       <PagamentoContainer>
         <InputLabel> Forma de Pagamento </InputLabel>
+        <Select
+          value={formaPagamento.id}
+          onChange={(event) => mudarFormaDePagamento(event.target.value)}
+        >
+          {tiposDePagamento.map(pagamento => {
+            return <MenuItem value={pagamento.id} key={pagamento.id}>{pagamento.nome}</MenuItem>
+          })}
+        </Select>
       </PagamentoContainer>
       <TotalContainer>
           <div>
             <h2>Total no Carrinho: </h2>
-            <span>R$ {Math.floor(valorProdutos)} </span>
+            <span>R$ {(valorProdutos).toFixed(2)} </span>
           </div>
           <div>
             <h2> Saldo: </h2>
-            <span> R$ {saldo} </span>
+            <span> R$ {Number(saldo).toFixed(2)} </span>
           </div>
           <div>
             <h2> Saldo Total: </h2>
-            <span> R$ {Math.ceil(saldo - valorProdutos)}</span>
+            <span> 
+              R$ {total.toFixed(2)} 
+            </span>
           </div>
         </TotalContainer>
       <Button
@@ -47,6 +60,7 @@ function Carrinho() {
         }}
         color="primary"
         variant="contained"
+        disabled={total < 0}
       >
          Comprar
        </Button>
