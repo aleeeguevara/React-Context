@@ -1,4 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { usePagamentoContext } from "./Pagamento";
+import { UsuarioContext } from "./Usuario";
 
 export const CarrinhoContext = createContext();
 CarrinhoContext.displayName = "Carrinho";
@@ -36,7 +38,8 @@ export const useCarrinhoContext = () => {
       valorProdutos,
       setValorProdutos
     } = useContext(CarrinhoContext);
-
+    const { formaPagamento } = usePagamentoContext();
+    const { setSaldo } = useContext(UsuarioContext);
 
     function mudarQuantidade(id, quantidade) {
       return carrinho.map(itemDoCarrinho => {
@@ -70,6 +73,11 @@ export const useCarrinhoContext = () => {
           setCarrinho(mudarQuantidade(id, -1));
       }
 
+      function efetuarCompra(){
+        setCarrinho([]);
+        setSaldo(saldoAtual => saldoAtual - valorProdutos);
+      }
+
 
       //escutar o carrinho e sempre que o state mudar tem que fazer a contagem de produto
       //como é um listener, o react disponibiliza o useEffect
@@ -84,9 +92,9 @@ export const useCarrinhoContext = () => {
         
         
         setQuantidadeProdutos(novaQuantidade);
-        setValorProdutos(novoTotal);
+        setValorProdutos(novoTotal  * formaPagamento.juros);
 
-      },[carrinho, setQuantidadeProdutos, setValorProdutos]);
+      },[carrinho, setQuantidadeProdutos, setValorProdutos, formaPagamento ]);
     
     return {
      carrinho, 
@@ -94,7 +102,7 @@ export const useCarrinhoContext = () => {
      adicionarProduto,
      removerProduto,
      quantidadeProdutos,
-     valorProdutos
-    
+     valorProdutos,
+     efetuarCompra,
     };
 }  

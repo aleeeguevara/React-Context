@@ -10,11 +10,11 @@ import { Container, Voltar, TotalContainer, PagamentoContainer} from './styles';
 
 function Carrinho() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const { valorProdutos, carrinho } = useCarrinhoContext();
+  const { valorProdutos, carrinho, efetuarCompra } = useCarrinhoContext();
   const { tiposDePagamento, formaPagamento, mudarFormaDePagamento } = usePagamentoContext();
   const { saldo = 0 } = useContext(UsuarioContext);
   const history = useHistory();
-  const total = useMemo(()=> (saldo - (valorProdutos * formaPagamento.juros)), [saldo, valorProdutos, formaPagamento]) //só vai calcular o total se o saldo, valorProdutos ou formaPagamento mudarem. Para não ter que calcular novamente a cada renderização feita.
+  const total = useMemo(()=> (saldo - (valorProdutos)), [saldo, valorProdutos]) //só vai calcular o total se o saldo, valorProdutos ou formaPagamento mudarem. Para não ter que calcular novamente a cada renderização feita.
   return (
     <Container>
       <Voltar onClick={() => history.goBack('/feira')}/>
@@ -57,10 +57,11 @@ function Carrinho() {
       <Button
         onClick={() => {
           setOpenSnackbar(true);
+          efetuarCompra();
         }}
         color="primary"
         variant="contained"
-        disabled={total < 0}
+        disabled={total < 0 || carrinho.length === 0}
       >
          Comprar
        </Button>
